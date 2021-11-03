@@ -1,0 +1,56 @@
+{% extends 'base.html' %} {% block content %}
+
+
+<img class="mt-5" src="{{ user.image_url }}" alt="Image for {{ user.username }}" id="profile-avatar">
+<div class="row full-width">
+    <div class="container">
+        <div class="row justify-content-end">
+            <div class="col-9">
+                <ul class="user-stats nav nav-pills">
+                    <div class="ml-auto">
+                        {% if g.user.id == user.id %}
+                        <a href="/users/profile" class="btn btn-outline-secondary">Edit Profile</a>
+                        <form method="POST" action="/users/delete" class="form-inline">
+                            <button class="btn btn-outline-danger ml-2">Delete Profile</button>
+                        </form>
+                        {% elif g.user %} {% if g.user.is_following(user) %}
+                        <form method="POST" action="/users/stop-following/{{ user.id }}">
+                            <button class="btn btn-primary">Unfollow</button>
+                        </form>
+                        {% else %}
+                        <form method="POST" action="/users/follow/{{ user.id }}">
+                            <button class="btn btn-outline-primary">Follow</button>
+                        </form>
+                        {% endif %} {% endif %}
+                    </div>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-sm-3">
+        <h4 id="sidebar-username">@{{ user.username }}</h4>
+        <p>{{user.bio}}</p>
+
+    </div>
+
+    {% block user_details %} {% endblock %}
+
+    <div class="card">
+        <div class="card-header">
+            Submitted Quiz
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">Quiz Results: Short Stories for children</h5>
+            <h1>Your Score: {{points}}/5</h1>
+            <p class="card-text"><a href="/users/{{user.id}}">Home</a></p>
+        </div>
+    </div>
+
+
+
+
+    {% endblock %}

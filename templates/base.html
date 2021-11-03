@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Warbler</title>
+  <title>Easy English</title>
 
   <link rel="stylesheet"
         href="https://unpkg.com/bootstrap/dist/css/bootstrap.css">
@@ -18,19 +18,19 @@
 </head>
 
 <body class="{% block body_class %}{% endblock %}">
-<nav class="navbar navbar-expand">
-  <div class="container-fluid">
+<nav class="navbar navbar-expand bg-primary">
+  <div class="container-fluid bg-primary">
     <div class="navbar-header">
       <a href="/" class="navbar-brand">
-        <img src="/static/images/warbler-logo.png" alt="logo">
-        <span>Warbler</span>
+        <img src="https://img.favpng.com/10/0/6/logo-english-language-brand-learning-font-png-favpng-6P0naAZdWU3yPtcNs4j7yDpfT.jpg" alt="logo">
+        <span>Easy English</span>
       </a>
     </div>
     <ul class="nav navbar-nav navbar-right">
       {% if request.endpoint != None %}
       <li>
-        <form class="navbar-form navbar-right" action="/users">
-          <input name="q" class="form-control" placeholder="Search Warbler" id="search">
+        <form id="searchForm" class="navbar-form navbar-right" action="/users">
+          <input name="q" class="form-control" placeholder="Dictionary" id="search">
           <button class="btn btn-default">
             <span class="fa fa-search"></span>
           </button>
@@ -46,7 +46,6 @@
           <img src="{{ g.user.image_url }}" alt="{{ g.user.username }}">
         </a>
       </li>
-      <li><a href="/messages/new">New Message</a></li>
       <li><a href="/logout">Log out</a></li>
       {% endif %}
     </ul>
@@ -61,5 +60,23 @@
   {% endblock %}
 
 </div>
+
+<script>
+  let searchForm = document.getElementById('searchForm')
+  let search = document.getElementById('search')
+  searchForm.addEventListener('submit',function(e) {
+    e.preventDefault()
+    let searchValue = search.value
+
+    let url = `https://api.dictionaryapi.dev/api/v2/entries/en/${searchValue}`
+    let options = {
+      method: 'get'
+    }
+    fetch(url,options).then(res=>res.json()).then(json_res=>{
+      alert(`${searchValue} - ` + json_res[0]['meanings'][0]['definitions'][0]['definition'])
+    })
+  })
+</script>
+
 </body>
 </html>

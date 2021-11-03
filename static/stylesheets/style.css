@@ -23,7 +23,7 @@ body.error-404 {
 /* ======================= Nav */
 
 .navbar {
-  background-color: #fff;
+  background-color: lightcoral;
   height: 46px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.25);
   margin-bottom: 1rem;
@@ -32,7 +32,7 @@ body.error-404 {
 }
 
 .navbar a {
-  color: #66757f;
+  color: white;
   font-size: 13px;
   font-weight: bold;
 }
@@ -171,8 +171,8 @@ nav + .container {
 }
 
 #profile-avatar {
-  width: 200px;
-  height: 200px;
+  width: 125px;
+  height: 125px;
   border: 5px solid #fff;
   margin-top: -120px;
   z-index: 1;
@@ -196,13 +196,6 @@ nav + .container {
   margin-left: 10px;
 }
 
-#warbler-hero {
-  height: 360px;
-  margin-top: -16px;
-  opacity: 0.7;
-  background-size: cover;
-  background-position: top center;
-}
 
 .full-width {
   width: 100vw;
@@ -396,7 +389,7 @@ p.card-bio {
   width: 100vw;
   left: 0;
   z-index: -1;
-  background-image: url("/static/images/signed-out-home.jpg");
+  background-image: url("https://i.pinimg.com/originals/a7/b2/99/a7b299d5d0ff56333147be3d222b0ad0.jpg");
   background-size: cover;
   background-position: center center;
   color: #fff;

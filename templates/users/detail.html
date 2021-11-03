@@ -1,72 +1,213 @@
-{% extends 'base.html' %}
+{% extends 'base.html' %} {% block content %}
 
-{% block content %}
 
-<div style="background-image: url('{{user.header_image_url}}');" id="warbler-hero" class="full-width"></div>
-<img src="{{ user.image_url }}" alt="Image for {{ user.username }}" id="profile-avatar">
+<img class="mt-5" src="{{ user.image_url }}" alt="Image for {{ user.username }}" id="profile-avatar">
 <div class="row full-width">
-  <div class="container">
-    <div class="row justify-content-end">
-      <div class="col-9">
-        <ul class="user-stats nav nav-pills">
-          <li class="stat">
-            <p class="small">Messages</p>
-            <h4>
-              <a href="/users/{{ user.id }}">{{ user.messages | length }}</a>
-            </h4>
-          </li>
-          <li class="stat">
-            <p class="small">Following</p>
-            <h4>
-              <a href="/users/{{ user.id }}/following">{{ user.following | length }}</a>
-            </h4>
-          </li>
-          <li class="stat">
-            <p class="small">Followers</p>
-            <h4>
-              <a href="/users/{{ user.id }}/followers">{{ user.followers | length }}</a>
-            </h4>
-          </li>
-          <li class="stat">
-            <p class="small">Likes</p>
-            <h4>
-              <a href="/users/{{user.id}}/likes">{{ user.likes|length }}</a>
-            </h4>
-          </li>
-          <div class="ml-auto">
-            {% if g.user.id == user.id %}
-            <a href="/users/profile" class="btn btn-outline-secondary">Edit Profile</a>
-            <form method="POST" action="/users/delete" class="form-inline">
-              <button class="btn btn-outline-danger ml-2">Delete Profile</button>
-            </form>
-            {% elif g.user %}
-            {% if g.user.is_following(user) %}
-            <form method="POST" action="/users/stop-following/{{ user.id }}">
-              <button class="btn btn-primary">Unfollow</button>
-            </form>
-            {% else %}
-            <form method="POST" action="/users/follow/{{ user.id }}">
-              <button class="btn btn-outline-primary">Follow</button>
-            </form>
-            {% endif %}
-            {% endif %}
-          </div>
-        </ul>
+    <div class="container">
+        <div class="row justify-content-end">
+            <div class="col-9">
+                <ul class="user-stats nav nav-pills">
+                    <div class="ml-auto">
+                        {% if g.user.id == user.id %}
+                        <a href="/users/profile" class="btn btn-outline-secondary">Edit Profile</a>
+                        <!-- Button trigger modal -->
+<button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleModal">
+    Delete Profile
+  </button>
+  
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Delete Profile</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to Delete your profile?
+        </div>
+        <div class="modal-footer">
+          <form method="POST" action="/users/delete" class="form-inline">
+            <button class="btn btn-outline-danger ml-2">Delete Profile</button>
+        </form>
+        </div>
       </div>
     </div>
   </div>
+                        
+                        {% elif g.user %} {% if g.user.is_following(user) %}
+                        <form method="POST" action="/users/stop-following/{{ user.id }}">
+                            <button class="btn btn-primary">Unfollow</button>
+                        </form>
+                        {% else %}
+                        <form method="POST" action="/users/follow/{{ user.id }}">
+                            <button class="btn btn-outline-primary">Follow</button>
+                        </form>
+                        {% endif %} {% endif %}
+                    </div>
+                </ul>
+            </div>
+        </div>
+    </div>
 </div>
+
 
 <div class="row">
-  <div class="col-sm-3">
-    <h4 id="sidebar-username">@{{ user.username }}</h4>
-    <p>{{user.bio}}</p>
-    <p class="user-location"><span class="fa fa-map-marker"></span>{{user.location}}</p>
-  </div>
+    <div class="col-sm-3">
+        <h2 class="display-3" >{{ user.username }}</h2>
+        <p>{{user.bio}}</p>
 
-  {% block user_details %}
-  {% endblock %}
+    </div>
 
-</div>
+    {% block user_details %} {% endblock %}
+    <div class="row">
+        <div class="col">
 
-{% endblock %}
+            <div class="card">
+                <div class="card-header">
+                    Grammar Book
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Grammar Book</h5>
+                    <p class="card-text">Learn basic grammar</p>
+                    <a href="/grammar-book" class="btn btn-primary">read now</a>
+                    <!-- <div style="float:right">
+
+                        <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" class="bi bi-check-square-fill" viewBox="0 0 16 16">
+                        <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm10.03 4.97a.75.75 0 0 1 .011 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.75.75 0 0 1 1.08-.022z"/>
+                      </svg>
+
+                    </div> -->
+                </div>
+
+            </div>
+        </div>
+        <div class="col">
+
+            <div class="card">
+                <div class="card-header">
+                    Story Book
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Story Book</h5>
+                    <p class="card-text">Check out our stories</p>
+                    <a href="/story-book" class="btn btn-primary">read now</a>
+                    <!-- <div style="float:right">
+
+                        <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" class="bi bi-check-square-fill" viewBox="0 0 16 16">
+                      <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm10.03 4.97a.75.75 0 0 1 .011 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.75.75 0 0 1 1.08-.022z"/>
+                    </svg>
+
+                    </div> -->
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+    <div class="row mt-3">
+        <div class="col">
+
+            <div class="card">
+                <div class="card-header">
+                    Videos
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Videos</h5>
+                    <p class="card-text">Watch our instructor</p>
+                    <a href="/video" class="btn btn-primary">watch now</a>
+                    <!-- <div style="float:right">
+
+                        <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" class="bi bi-check-square-fill" viewBox="0 0 16 16">
+                      <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm10.03 4.97a.75.75 0 0 1 .011 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.75.75 0 0 1 1.08-.022z"/>
+                    </svg>
+
+                    </div> -->
+                </div>
+            </div>
+        </div>
+        <div class="col">
+
+            <div class="card">
+                <div class="card-header">
+                    Quiz
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Quiz</h5>
+                    <p class="card-text">Take our quiz</p>
+                    <a href="/quiz" class="btn btn-primary">take quiz</a>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="row mt-3">
+        <div class="col">
+
+            <div class="card">
+                <div class="card-header">
+                    Your Progress
+                </div>
+                <div class="card-body">
+                    <h2 class="card-title">Total Progress</h2>
+
+                    <ul>
+                        <li class="mb-3">
+                            <div>
+                                <span class="pr-3">Grammer Book</span> {% if progress.is_grammar_book_completed %}
+
+                                <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" class="bi bi-check-square-fill" viewBox="0 0 16 16">
+                                  <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm10.03 4.97a.75.75 0 0 1 .011 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.75.75 0 0 1 1.08-.022z"/>
+                                </svg> {% endif %}
+
+                            </div>
+                        </li>
+                        <li class="mb-3">
+                            <div>
+                                <span class="pr-3">Story Book</span> {% if progress.is_story_book_completed %}
+                                <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" class="bi bi-check-square-fill" viewBox="0 0 16 16">
+                              <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm10.03 4.97a.75.75 0 0 1 .011 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.75.75 0 0 1 1.08-.022z"/>
+                            </svg> {% endif %}
+                            </div>
+
+                        </li>
+                        <li class="mb-3">
+                            <div>
+                                <span class="pr-3">Video Completed</span> {% if progress.is_video_completed %}
+                                <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor" class="bi bi-check-square-fill" viewBox="0 0 16 16">
+                              <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm10.03 4.97a.75.75 0 0 1 .011 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.75.75 0 0 1 1.08-.022z"/>
+                            </svg> {% endif %}
+                            </div>
+                        </li>
+                        <li class="mb-3">
+                            <div>
+                                <span class="pr-3">Points : </span> {% if progress.quiz_score %} {{progress.quiz_score}}/5 {% else %} 0/5 {% endif %}
+
+                            </div>
+                        </li>
+
+                 
+                    </ul>
+                    {% if progress.is_grammar_book_completed and progress.is_story_book_completed and 
+                        progress.is_video_completed and progress.quiz_score > 3 %}
+                    <a href="/get-certificate">Recieve Your English Course Certificate</a>
+
+                    {% endif %}
+                        <h1 class="text-danger">Complete all four tasks to get certified </h1>
+
+                </div>
+            </div>
+        </div>
+
+
+
+    </div>
+
+
+
+
+    {% endblock %}

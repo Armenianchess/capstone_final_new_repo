@@ -1,11 +1,11 @@
 import os
 
 from flask import Flask, render_template, request, flash, redirect, session, g, abort
-from flask_debugtoolbar import DebugToolbarExtension
+# from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 
 from forms import UserAddForm, LoginForm, MessageForm, UserEditForm
-from models import db, connect_db, User, Message
+from models import db, connect_db, User, Progress
 
 CURR_USER_KEY = "curr_user"
 
@@ -14,13 +14,13 @@ app = Flask(__name__)
 # Get DB_URI from environ variable (useful for production/testing) or,
 # if not set there, use development local db.
 app.config['SQLALCHEMY_DATABASE_URI'] = (
-    os.environ.get('DATABASE_URL', 'postgresql:///warbler2'))
+    os.environ.get('DATABASE_URL', 'postgresql:///english_site'))
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = False
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = True
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "it's a secret")
-toolbar = DebugToolbarExtension(app)
+# toolbar = DebugToolbarExtension(app)
 
 connect_db(app)
 
@@ -144,19 +144,8 @@ def users_show(user_id):
     """Show user profile."""
 
     user = User.query.get_or_404(user_id)
-
-    # snagging messages in order from the database;
-    # user.messages won't be in order by default
-    messages = (Message
-                .query
-                .filter(Message.user_id == user_id)
-                .order_by(Message.timestamp.desc())
-                .limit(100)
-                .all())
-    likes = [message.id for message in user.likes]
-    # likes_counts = len(likes)
-    # , likes_counts=likes_counts
-    return render_template('users/show.html', user=user, messages=messages, likes=likes)
+    progress=Progress.query.filter_by(user_id=user.id).first()
+    return render_template('users/show.html', user=user,progress=progress)
 
 
 @app.route('/users/<int:user_id>/following')
@@ -261,9 +250,8 @@ def profile():
         if User.authenticate(user.username, form.password.data):
             user.username = form.username.data
             user.email = form.email.data
-            user.image_url = form.image_url.data or "/static/images/default-pic.png"
-            user.header_image_url = form.header_image_url.data or "/static/images/warbler-hero.jpg"
-            user.bio = form.bio.data
+            user.image_url = form.image_url.data or "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQUDAr2Zy9ZAs8KhMkc91DlHzoqFuLfXaZ1wFL9Iqr2k7iEfL0U6r8mG3i48HBecICyiDE&usqp=CAU"
+            user.header_image_url = form.header_image_url.data or "https://new.mospolytech.ru/upload/iblock/f7d/student-privacy4.jpg"
 
             db.session.commit()
             return redirect(f"/users/{user.id}")
@@ -338,9 +326,142 @@ def messages_destroy(message_id):
 
     return redirect(f"/users/{g.user.id}")
 
+@app.route('/video')
 
+def watch_video():
+    user = g.user
+    return render_template('watch-video.html',user=user)
+
+
+@app.route('/grammar-book')
+def read_grammar_book():
+    user = g.user
+    return render_template('grammar-book.html',user=user)
+
+
+@app.route('/story-book')
+def read_story_book():
+    user = g.user
+    return render_template('story-book.html',user=user)
+
+@app.route('/quiz')
+def take_quiz():
+    user = g.user
+    return render_template('quiz.html',user=user)
+
+@app.route('/submit-quiz',methods=['POST'])
+def submit_quiz():
+    points = 0;
+    try:
+        if request.form['q1'] == 'r4':
+            points += 1
+    
+        if request.form['q2'] == 'r1':
+            points += 1
+
+        if request.form['q3'] == 'r1':
+            points += 1
+
+        if request.form['q4'] == 'r2':
+            points += 1
+
+        if request.form['q5'] == 'r2':
+            points += 1
+
+        print(points)
+    except:
+        return redirect('/quiz')
+    user = g.user
+    quiz_progress = Progress.query.filter_by(user_id = user.id).first()
+    print(quiz_progress)
+    if not quiz_progress:
+        progress_db = Progress(
+            user_id = user.id,
+            quiz_score = points,
+            is_grammar_book_completed = False,
+            is_story_book_completed = False,
+            is_video_completed = False
+        )
+        db.session.add(progress_db)
+        db.session.commit()
+
+    else: 
+        quiz_progress.quiz_score = points
+        db.session.commit()
+
+    return render_template('submit-quiz.html',user=user,points=points)
+
+
+
+
+@app.route('/grammar-book-completed')
+def grammar_book_completed():
+    
+    user = g.user
+    progress = Progress.query.filter_by(user_id = user.id).first()
+    if not progress:
+        progress_db = Progress(
+            user_id = user.id,
+            quiz_score = 0,
+            is_grammar_book_completed = True,
+            is_story_book_completed = False,
+            is_video_completed = False
+        )
+        db.session.add(progress_db)
+        db.session.commit()
+
+    else: 
+        progress.is_grammar_book_completed = True
+        db.session.commit()
+
+    return redirect(f'/users/{user.id}')
+@app.route('/story-book-completed')
+def story_book_completed():
+    
+    user = g.user
+    progress = Progress.query.filter_by(user_id = user.id).first()
+    if not progress:
+        progress_db = Progress(
+            user_id = user.id,
+            quiz_score = 0,
+            is_grammar_book_completed = False,
+            is_story_book_completed = True,
+            is_video_completed = False
+        )
+        db.session.add(progress_db)
+        db.session.commit()
+
+    else: 
+        progress.is_story_book_completed = True
+        db.session.commit()
+
+    return redirect(f'/users/{user.id}')
+
+@app.route('/video-completed')
+def video_completed():
+    
+    user = g.user
+    progress = Progress.query.filter_by(user_id = user.id).first()
+    if not progress:
+        progress_db = Progress(
+            user_id = user.id,
+            quiz_score = 0,
+            is_grammar_book_completed = False,
+            is_story_book_completed = False,
+            is_video_completed = True
+        )
+        db.session.add(progress_db)
+        db.session.commit()
+
+    else: 
+        progress.is_video_completed = True
+        db.session.commit()
+
+    return redirect(f'/users/{user.id}')
 ##############################################################################
 # Homepage and error pages
+
+
 
 
 @app.route('/')
@@ -352,24 +473,23 @@ def homepage():
     """
 
     if g.user:
-        following_ids = [f.id for f in g.user.following] + [g.user.id]
-
-        messages = (Message
-                    .query
-                    .filter(Message.user_id.in_(following_ids))
-                    .order_by(Message.timestamp.desc())
-                    .limit(100)
-                    .all())
-
-        liked_msg_ids = [msg.id for msg in g.user.likes]
         # liked_msg_ids2 = []
         # # for msg in g.user.likes:
         # #     liked_msg_ids2.append(msg.id)
 
-        return render_template('home.html', messages=messages)
+        return redirect(f'/users/{g.user.id}')
 
     else:
         return render_template('home-anon.html')
+
+
+@app.route('/get-certificate')
+def get_certificate():
+    
+    user = g.user
+     
+
+    return render_template('certificate.html',user=user)
 
 
 ##############################################################################
@@ -390,7 +510,7 @@ def add_header(req):
     return req
 
 
-app.run(debug=True)
+# app.run(debug=True)
 
 
 
